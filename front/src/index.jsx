@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import Home from './pages/Home'
 import Contact from './pages/Contact'
-import Map from './pages/Map'
+import SimpleMap from './pages/Map'
 import Header from './components/Header'
 import Error from './components/Error'
 
@@ -16,7 +16,8 @@ ReactDOM.render(
           <Home />
         </Route>
         <Route exact path="/map">
-          <Map />
+          <br></br>
+          <SimpleMap />
         </Route>
         <Route exact path="/contact">
           <Contact />
