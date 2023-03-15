@@ -18,7 +18,11 @@ export default function Carte(){
       <GoogleMapReact
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         bootstrapURLKeys={{ key: "" }}
+=======
+        bootstrapURLKeys={{key:apikey}}
+>>>>>>> 73bacebc151daa34929a24af7d74768907af9d41
 =======
         bootstrapURLKeys={{key:apikey}}
 >>>>>>> 73bacebc151daa34929a24af7d74768907af9d41
@@ -38,7 +42,11 @@ export default function Carte(){
   );
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 }
+=======
+};
+>>>>>>> 73bacebc151daa34929a24af7d74768907af9d41
 =======
 };
 >>>>>>> 73bacebc151daa34929a24af7d74768907af9d41
