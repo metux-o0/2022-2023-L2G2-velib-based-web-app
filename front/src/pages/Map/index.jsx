@@ -2,18 +2,18 @@ import React from "react";
 import GoogleMapReact from 'google-map-react';
 import config from './config.json'
 import Search from "./Search";
-//import { useState,useEffect } from "react";//parser les donnée 解析
+
+const Point =({image})=><div>{image}</div>;
 const apikey=config.googlemapkey;
-const datas=require('../../stations.json')
-const Point=({text})=><div>{text}</div>;
+//const datas=require('../../stations.json')
 export default function Carte(){
-  //const [datas,setDatas]=useState([]);
-  /*useEffect(()=>{
-    fetch('')
-    .then((response)=>response.json())
-    .then((json)=>setDatas(json));
-  },[]);*/ //pour le server
-  const stations=datas.data.stations;
+  //parser les donnée 解析
+  const [stations,setData]=React.useState([]);
+  React.useEffect(()=>{
+    fetch("/stations")
+    .then((res)=>res.json())
+    .then((stations)=>setData(stations.data.stations));
+  },[]);
   const defaultProps = {
     center: {
       lat: 48.8607882,
@@ -36,12 +36,11 @@ export default function Carte(){
             key={station.station_id}
             lat={station.lat}
             lng={station.lon}
-            text="📍"
+            image="📍"
               />
           );
         })}
       </GoogleMapReact>
     </div>
   );
-
 };
