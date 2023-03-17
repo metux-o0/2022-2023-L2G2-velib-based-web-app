@@ -60,5 +60,5 @@ app.use((req, res) => {
 
 // Pour demarrer le serveur et le faire ecouter sur un port passé en parametre
 app.listen(port, () => {
-  console.log(`Serveur ecoute sur le port : ${port}`);
+  console.log(`Serveur écoute sur le port : ${port}`);
 });
