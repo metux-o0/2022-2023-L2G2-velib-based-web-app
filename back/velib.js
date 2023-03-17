@@ -1,7 +1,7 @@
 const express = require("express");
 const axios = require("axios");
 const app = express();
-const port = 4000;
+const port = process.env.port || 4000;
 
 const fuseauHoraire =
   "https://velib-metropole-opendata.smoove.pro/opendata/Velib_Metropole/system_information.json";
@@ -76,5 +76,5 @@ app.use((req, res) => {
 
 // Pour demarrer le serveur et le faire ecouter sur un port passé en parametre
 app.listen(port, () => {
-  console.log(`Serveur ecoute sur le port : ${port}`);
+  console.log(`Serveur écoute sur le port : ${port}`);
 });
