@@ -5,8 +5,6 @@ const port = 4000;
 
 const fuseauHoraire =
   "https://velib-metropole-opendata.smoove.pro/opendata/Velib_Metropole/system_information.json";
-const fluxExistants =
-  "https://velib-metropole-opendata.smoove.pro/opendata/Velib_Metropole/gbfs.json";
 const veloBornetteDispo =
   "https://velib-metropole-opendata.smoove.pro/opendata/Velib_Metropole/station_status.json";
 const stationLocalisation =
@@ -35,17 +33,6 @@ const getVeloDispo = async (req, res, next) => {
   }
 };
 
-//Middleware pour récupérer les velos dispo
-const getFluxExistant = async (req, res, next) => {
-  try {
-    const response = await axios.get(fluxExistants);
-    //console.log(data);
-    res.status(200).json(response.data);
-  } catch (err) {
-    next(err);
-  }
-};
-
 // Middleware pour récupérer le fuseau
 const getFuseau = async (req, res, next) => {
   try {
@@ -62,9 +49,6 @@ app.get("/stations", getStations);
 
 //Définir la route /velodispo pour récupérer la liste des velos disponibles
 app.get("/velodispo", getVeloDispo);
-
-//Définir la route /flux pour récupérer le flux existants
-app.get("/flux", getFluxExistant);
 
 // Définir la route /fuseau pour récupérer le fuseau horaire
 app.get("/fuseau", getFuseau);
