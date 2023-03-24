@@ -1,12 +1,15 @@
 import React from "react";
 import '../../styles/Carte.css'
 import GoogleMapReact from 'google-map-react';
-import config from './config.json'
-import Search from "./Search";
-import Localisation from '../../images/localisation.png'
-const Point =({mecanique,electrique,stationCode,name, onClick})=>(
-  <button onClick={onClick} title={"Station n°"+stationCode+"\n"+name+"\nVélib mécanique(s) : "+mecanique+"\nVélib éléctrique(s) : "+electrique} className="point">
-     <img src={Localisation} alt='vélib' />
+import config from './config.json';
+import Localisation from '../../images/localisation.png';
+const Point = ({ place,cb,mecanique, electrique, stationCode, name, onClick }) => (
+  <button
+    onClick={onClick}
+    title={`Station n° ${stationCode}\n${name}\nVélib mécanique(s) : ${mecanique}\nVélib éléctrique(s) : ${electrique}\nPlace(s) : ${place}\nPass temporaires : ${cb}`}
+    className="point"
+  >
+    <img src={Localisation} alt="vélib" />
   </button>
 );
 const apikey=config.googlemapkey;
@@ -23,7 +26,7 @@ export default function Carte(){
   React.useEffect(()=>{
     fetch("/velodispo")
     .then((res)=>res.json())
-    .then((stations)=>setVelos(stations.data.stations));
+    .then((velos)=>setVelos(velos.data.stations));
   },[]);
   const defaultProps = {
     center: {
@@ -32,32 +35,29 @@ export default function Carte(){
     },
     zoom: 13,
   }
-  const handleMarkerClick = (station) => {
-    // gérer l'événement de clic ici
-    console.log(`Cliqué sur la station ${station.name}`);
-  }
   return (
     <div style={{ height: '100vh', width: '100%'}}>
-      <Search />
       <GoogleMapReact
-
         bootstrapURLKeys={{key:apikey}}
         defaultCenter={defaultProps.center}
         defaultZoom={defaultProps.zoom}
       >
-        {stations.map((station)=>{
-            return(
-              <Point 
-              key={station.station_id}
-              lat={station.lat}
-              lng={station.lon}
-              stationCode={station.stationCode}
-              name={station.name}
-              onClick={() => handleMarkerClick(station)}
-                />
-            )
-        })}
-        
+        {stations.map((station) => {
+          const velo=velos.find(({station_id})=>station_id===station.station_id);
+          return (
+          <Point 
+          key={station.station_id}
+          lat={station.lat}
+          lng={station.lon}
+          stationCode={station.stationCode}
+          name={station.name}
+          mecanique={velo.num_bikes_available_types[0].mechanical}
+          electrique={velo.num_bikes_available_types[1].ebike}
+          place={velo.numDocksAvailable}
+          cb={station.rental_methods ? "achat possible en station (CB)":"pas d'achat possible en station"}
+          />
+          )
+          })}
       </GoogleMapReact>
     </div>
   );
