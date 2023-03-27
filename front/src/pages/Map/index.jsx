@@ -107,6 +107,7 @@ directionsService.route(
           key={station.station_id}
           position={{ lat: station.lat, lng: station.lon }}
           onClick={() => handleMarkerClick(station)}
+          label={`${velo.num_bikes_available}`}
           >
             {selectedStation && selectedStation.station_id === station.station_id && (
             <InfoWindow onCloseClick={() => setSelectedStation(null)}>
