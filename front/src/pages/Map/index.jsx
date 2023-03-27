@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { GoogleMap, LoadScript, Autocomplete, Marker,InfoWindow } from '@react-google-maps/api';
+import { GoogleMap, LoadScript, Autocomplete, Marker,InfoWindow,DirectionsRenderer } from '@react-google-maps/api';
 import config from './config.json'
 const mapContainerStyle = {
   width: '100%',
@@ -23,6 +23,7 @@ export default function Carte() {
   const [searchBox, setSearchBox] = useState(null);
   const [markerPosition, setMarkerPosition] = useState(null);
   const [selectedStation, setSelectedStation] = useState(null);
+  const [directions, setDirections] = useState(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -72,6 +73,22 @@ export default function Carte() {
   },[]);
   const handleMarkerClick = (station) => {
     setSelectedStation(station);
+    const directionsService = new window.google.maps.DirectionsService();
+directionsService.route(
+  {
+    origin: markerPosition,
+    destination: { lat: station.lat, lng: station.lon },
+    travelMode: window.google.maps.TravelMode.BICYCLING
+  },
+  (result, status) => {
+    if (status === window.google.maps.DirectionsStatus.OK) {
+      setDirections(result);
+    } else {
+      console.error(`error fetching directions ${result}`);
+    }
+  }
+);
+
   };
   return (
     <LoadScript googleMapsApiKey={config.googlemapkey} libraries={libraries}>
@@ -157,6 +174,29 @@ export default function Carte() {
             }}
           />
         </Autocomplete>
+        {directions && (
+  <DirectionsRenderer
+    directions={directions}
+    options={{
+      polylineOptions: {
+        strokeColor: "#FF0000",
+        strokeOpacity: 0.8,
+        strokeWeight: 5
+      },
+      markerOptions: {
+        icon: {
+          path: window.google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+          strokeColor: "#FF0000",
+          fillColor: "#FF0000",
+          fillOpacity: 1,
+          strokeWeight: 2,
+          scale: 4
+        }
+      }
+    }}
+  />
+)}
+
       </GoogleMap>
     </LoadScript>
   );
