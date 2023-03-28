@@ -19,6 +19,9 @@ const options = {
 const libraries=["places"];
 
 export default function Carte() {
+  //crochets:d'utiliser l'état et d'autres fonctionnalités de React sans écrire de classe
+  //useState est un Hook qui vous permet d'ajouter l'état React aux composants de la fonction
+  //1er élément:valeur donné 2ème élément: fonction pour mise à jour
   const [map, setMap] = useState(null);
   const [searchBox, setSearchBox] = useState(null);
   const [markerPosition, setMarkerPosition] = useState(null);
@@ -27,24 +30,28 @@ export default function Carte() {
   const [distanceInfo, setDistanceInfo] = useState(null);
   const [showMechanical, setShowMechanical] = useState(false);
   const [showElectrique,setShowElectrique]=useState(false);
+  //useEffect: fonction après le render quand map change
   useEffect(() => {
+    //vérifie si l'objet "window" est défini
     if (typeof window !== 'undefined') {
+      //vérifie si l'objet "google" et "google.maps" est défini
       if (window.google && window.google.maps) {
-        const input = document.getElementById('autocomplete-input');
+        //DOM avec id 'autocomplete-input'
+        const input = document.getElementById('autocomplete-input')
         const searchBox = new window.google.maps.places.SearchBox(input);
         setSearchBox(searchBox);
-
+        //écouteur d'événement ajouté à l'objet SearchBox
         searchBox.addListener('places_changed', () => {
           const places = searchBox.getPlaces();
           if (places.length === 0) return;
-
+          //LatLngBounds: définir les limites des zones géographiques affichées, basé sur les coordonnées sélectionné
           const bounds = new window.google.maps.LatLngBounds();
           places.forEach((place) => {
             if (!place.geometry) return;
             bounds.extend(place.geometry.location);
             setMarkerPosition(place.geometry.location);
           });
-
+          //ajuster
           map.fitBounds(bounds);
           if (map.getZoom() > 15) {
             map.setZoom(15);
@@ -53,17 +60,18 @@ export default function Carte() {
       }
     }
   }, [map]);
-
+//creer
   const onLoad = (map) => {
     setMap(map);
   };
-
+//supprimer
   const onUnmount = () => {
     setMap(null);
   };
   const [stations,setStations]=useState([]);
   useEffect(()=>{
     fetch("/stations")
+    //then :méthode quand promesse est résolue avec succès
     .then((res)=>res.json())
     .then((stations)=>setStations(stations.data.stations));
   },[]);
@@ -78,6 +86,7 @@ export default function Carte() {
     service.getDistanceMatrix({
       origins: [origin],
       destinations: [destination],
+      //à pied
       travelMode: 'WALKING',
     }, (response, status) => {
       if (status === 'OK') {
@@ -96,11 +105,12 @@ export default function Carte() {
   const handleMarkerClick = (station) => {
     setSelectedStation(station);
     const directionsService = new window.google.maps.DirectionsService();
-directionsService.route(
+//méthode route() de l'objet DirectionsService 
+    directionsService.route(
   {
     origin: markerPosition,
     destination: { lat: station.lat, lng: station.lon },
-    travelMode: window.google.maps.TravelMode.BICYCLING
+    travelMode: window.google.maps.TravelMode.WALKING
   },
   (result, status) => {
     if (status === window.google.maps.DirectionsStatus.OK) {
@@ -166,8 +176,11 @@ if (searchBox && searchBox.getPlaces().length > 0) {
             position={markerPosition}
             icon={{
               path: window.google.maps.SymbolPath.CIRCLE,
+              //remplisage
               fillColor: "white",
+              //不透明度
               fillOpacity: 1,
+              //trait
               strokeColor: "black",
               strokeOpacity: 1,
               strokeWeight: 1,
@@ -199,11 +212,14 @@ if (searchBox && searchBox.getPlaces().length > 0) {
               width: `500px`,
               height: `50px`,
               padding: `0 12px`,
+              //rayon de bordure
               borderRadius: `3px`,
+              //框影
               boxShadow: `0 2px 6px rgba(0, 0, 0, 0.3)`,
               fontSize: `14px`,
-              outline: `none
-`,
+              //大纲
+              outline: `none`,
+              //文字溢出
               textOverflow: `ellipses`,
               position: "absolute",
               left: "50%",
@@ -228,6 +244,7 @@ if (searchBox && searchBox.getPlaces().length > 0) {
           fillColor: "#FF0000",
           fillOpacity: 1,
           strokeWeight: 2,
+          //规模
           scale: 4
         }
       }
