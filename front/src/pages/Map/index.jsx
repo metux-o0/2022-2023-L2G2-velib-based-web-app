@@ -25,7 +25,8 @@ export default function Carte() {
   const [selectedStation, setSelectedStation] = useState(null);
   const [directions, setDirections] = useState(null);
   const [distanceInfo, setDistanceInfo] = useState(null);
-
+  const [showMechanical, setShowMechanical] = useState(false);
+  const [showElectrique,setShowElectrique]=useState(false);
   useEffect(() => {
     if (typeof window !== 'undefined') {
       if (window.google && window.google.maps) {
@@ -88,7 +89,10 @@ export default function Carte() {
       }
     });
   };
-  
+  const handleFilterClick = () => {
+    setShowMechanical(!showMechanical);
+    setShowElectrique(!showElectrique);
+  };
   const handleMarkerClick = (station) => {
     setSelectedStation(station);
     const directionsService = new window.google.maps.DirectionsService();
@@ -115,6 +119,12 @@ if (searchBox && searchBox.getPlaces().length > 0) {
   };
   return (
     <LoadScript googleMapsApiKey={config.googlemapkey} libraries={libraries}>
+      <button onClick={handleFilterClick}>
+  {showMechanical ? 'Afficher toutes les stations' : 'Afficher les stations avec vélos mécaniques'}
+</button>
+<button onClick={handleFilterClick}>
+  {showElectrique ? 'Afficher toutes les stations' : 'Afficher les stations avec vélos éléctrique'}
+</button>
       <GoogleMap
         mapContainerStyle={mapContainerStyle}
         center={center}
@@ -125,6 +135,7 @@ if (searchBox && searchBox.getPlaces().length > 0) {
       >
         {stations.map((station) => {
           const velo = velos.find(({ station_id }) => station_id === station.station_id);
+          if ((!showMechanical || (velo.num_bikes_available_types[0].mechanical > 0))||(!showElectrique||(velo.num_bikes_available_types[1].ebike>0))) {
           return (
           <Marker
           key={station.station_id}
@@ -149,7 +160,7 @@ if (searchBox && searchBox.getPlaces().length > 0) {
                 )}
                 </Marker>
                 );
-                })}
+                }})}
         {markerPosition && (
           <Marker
             position={markerPosition}
