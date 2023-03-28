@@ -24,6 +24,7 @@ export default function Carte() {
   const [markerPosition, setMarkerPosition] = useState(null);
   const [selectedStation, setSelectedStation] = useState(null);
   const [directions, setDirections] = useState(null);
+  const [distanceInfo, setDistanceInfo] = useState(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -71,6 +72,23 @@ export default function Carte() {
     .then((res)=>res.json())
     .then((velos)=>setVelos(velos.data.stations));
   },[]);
+  const fetchDistanceInfo = (origin, destination) => {
+    const service = new window.google.maps.DistanceMatrixService();
+    service.getDistanceMatrix({
+      origins: [origin],
+      destinations: [destination],
+      travelMode: 'WALKING',
+    }, (response, status) => {
+      if (status === 'OK') {
+        const element = response.rows[0].elements[0];
+        setDistanceInfo({
+          distance: element.distance.text,
+          duration: element.duration.text,
+        });
+      }
+    });
+  };
+  
   const handleMarkerClick = (station) => {
     setSelectedStation(station);
     const directionsService = new window.google.maps.DirectionsService();
@@ -88,6 +106,11 @@ directionsService.route(
     }
   }
 );
+if (searchBox && searchBox.getPlaces().length > 0) {
+  const origin = searchBox.getPlaces()[0].formatted_address;
+  const destination = `${station.lat},${station.lon}`;
+  fetchDistanceInfo(origin, destination);
+}
 
   };
   return (
@@ -118,6 +141,9 @@ directionsService.route(
                 <p>Vélib éléctrique(s) : {velo.num_bikes_available_types[1].ebike}</p>
                 <p>Place(s) : {velo.numDocksAvailable}</p>
                 <p>Pass temporaires : {station.rental_methods ? "achat possible en station (CB)" : "pas d'achat possible en station"}</p>
+                {distanceInfo && (
+        <p>Distance: {distanceInfo.distance}, Durée: {distanceInfo.duration}</p>
+      )}
                 </div>
                 </InfoWindow>
                 )}
