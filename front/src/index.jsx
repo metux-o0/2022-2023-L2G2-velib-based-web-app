@@ -6,6 +6,7 @@ import Contact from './pages/Contact'
 import Carte from './pages/Map'
 import Header from './components/Header'
 import Error from './components/Error'
+import Inscription from './pages/Inscription'
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <Router>
@@ -20,6 +21,9 @@ root.render(
         </Route>
         <Route exact path="/contact">
           <Contact />
+        </Route>
+        <Route exact path='/inscription'>
+          <Inscription />
         </Route>
         <Route>
           <Error />

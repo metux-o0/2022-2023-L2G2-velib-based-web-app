@@ -30,6 +30,7 @@ export default function Carte() {
   const [distanceInfo, setDistanceInfo] = useState(null);
   const [showMechanical, setShowMechanical] = useState(false);
   const [showElectrique,setShowElectrique]=useState(false);
+  const [userLocation, setUserLocation] = useState(null);
   //useEffect: fonction après le render quand map change
   useEffect(() => {
     //vérifie si l'objet "window" est défini
@@ -61,9 +62,16 @@ export default function Carte() {
     }
   }, [map]);
 //creer
-  const onLoad = (map) => {
-    setMap(map);
-  };
+const onLoad = (map) => {
+  setMap(map);
+  // Ajout de l'appel à la fonction pour récupérer la position de l'utilisateur
+  navigator.geolocation.getCurrentPosition((position) => {
+    setUserLocation({
+      lat: position.coords.latitude,
+      lng: position.coords.longitude
+    });
+  });
+};
 //supprimer
   const onUnmount = () => {
     setMap(null);
@@ -137,13 +145,14 @@ if (searchBox && searchBox.getPlaces().length > 0) {
 </button>
       <GoogleMap
         mapContainerStyle={mapContainerStyle}
-        center={center}
+        center={userLocation ? userLocation : center}
         zoom={12}
         options={options}
         onLoad={onLoad}
         onUnmount={onUnmount}
       >
-        {stations.map((station) => {
+        {//eslint-disable-next-line
+        stations.map((station) => {
           const velo = velos.find(({ station_id }) => station_id === station.station_id);
           if ((!showMechanical || (velo.num_bikes_available_types[0].mechanical > 0))||(!showElectrique||(velo.num_bikes_available_types[1].ebike>0))) {
           return (
@@ -171,9 +180,9 @@ if (searchBox && searchBox.getPlaces().length > 0) {
                 </Marker>
                 );
                 }})}
-        {markerPosition && (
+        {(markerPosition||userLocation) && (
           <Marker
-            position={markerPosition}
+            position={markerPosition||userLocation}
             icon={{
               path: window.google.maps.SymbolPath.CIRCLE,
               //remplisage

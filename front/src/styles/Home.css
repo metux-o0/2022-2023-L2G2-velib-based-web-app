@@ -1,5 +1,11 @@
+h2{
+    text-align: center;
+}
 h3{
-    text-align: left;
+    text-align: center;
+}
+h4{
+    text-align: center;
 }
 body{
     background-color: rgb(171, 216, 230);
