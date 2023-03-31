@@ -2,22 +2,57 @@ const express = require("express");
 const axios = require("axios");
 const app = express();
 const port = 4000;
-const bodyParser = require('body-parser');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 app.use(bodyParser.json());
 
-const users = [];
+//Connexion à la base de données (locale)
+const dbURL = "mongodb://localhost:27017/ma_base_de_donnees";
+try {
+  mongoose.connect(dbURL, { useNewUrlParser: true, useUnifiedTopology: true });
+  console.log("Connexion réussie");
+} catch (err) {
+  console.log("Error connecting to database", err);
+}
+
+//用户的数据库模型
+const userSchema = new mongoose.Schema(
+  {
+    username: {
+      type: String,
+      required: true, //propriété obligatoire non vide
+      unique: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+  },
+  { timestamps: true } //date création et dernier màj
+);
+
+//通过mongoose.model上面的定义成模型
+const userModel = mongoose.model("users", userSchema);
+const users = new userModel();
 
 // Sign-up endpoint
-app.post('/signup', async (req, res) => {
+app.post("/signup", async (req, res) => {
   const { username, email, password } = req.body;
 
   // Check if the username or email is already taken
-  const existingUser = users.find(user => user.username === username || user.email === email);
+  const existingUser = users.find(
+    (user) => user.username === username || user.email === email
+  );
   if (existingUser) {
-    return res.status(409).json({ error: 'Username or email already taken' });
+    return res.status(409).json({ error: "Username or email already taken" });
   }
 
   // Hash the password
@@ -31,27 +66,27 @@ app.post('/signup', async (req, res) => {
   };
   users.push(newUser);
 
-  res.status(201).json({ message: 'User created successfully' });
+  res.status(201).json({ message: "User created successfully" });
 });
 
 // Login endpoint
-app.post('/login', async (req, res) => {
+app.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
   // Find the user by username
-  const user = users.find(user => user.username === username);
+  const user = users.find((user) => user.username === username);
   if (!user) {
-    return res.status(401).json({ error: 'Invalid credentials' });
+    return res.status(401).json({ error: "Invalid credentials" });
   }
 
   // Compare the password
   const passwordMatch = await bcrypt.compare(password, user.password);
   if (!passwordMatch) {
-    return res.status(401).json({ error: 'Invalid credentials' });
+    return res.status(401).json({ error: "Invalid credentials" });
   }
 
   // Create a JWT token
-  const token = jwt.sign({ userId: user.id }, 'secret', { expiresIn: '1h' });
+  const token = jwt.sign({ userId: user.id }, "secret", { expiresIn: "1h" });
 
   res.status(200).json({ token });
 });
