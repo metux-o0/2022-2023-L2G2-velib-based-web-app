@@ -44,24 +44,24 @@ export default function Inscription() {
       <h1>Inscription</h1>
       <form onSubmit={handleSubmit}>
         <label>
-          Nom:
+          Nom d'utilisateur : 
           <input type="text" name="name" onChange={handleUsernameChange} />
-        </label>
+          </label>
         <br></br>
         <label>
-          Email:
+          Email : 
           <input type="email" name="email" onChange={handleEmailChange} />
         </label>
         <br></br>
         <label>
-          Mot de passe:
+          Mot de passe : 
           <input type="password" name="password" onChange={handlePasswordChange} />
         </label>
         <br></br>
         <button type="submit">Valider</button>
       </form>
       <p>
-      Vous avez déjà un compte?<Link to="/login">Login</Link>
+      Vous avez déjà un compte?<Link to="/connection">Login</Link>
       </p>
     </div>
   );
