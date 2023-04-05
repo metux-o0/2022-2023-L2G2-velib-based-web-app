@@ -7,7 +7,6 @@ const cryptojs = require("crypto-js");
 const jwt = require("jsonwebtoken");
 
 const app = express();
-const port = 4000;
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -62,7 +61,7 @@ const Signup = async (req, res) => {
 
   //hasher mpd av envoyer bdd
   //salt=10 cb de fois sera éxecuté l'algo de hashage
-  bcrypt
+  await bcrypt
     .hash(password, 10)
     .then((hash) => {
       const user = new User({
@@ -93,11 +92,8 @@ const Login = async (req, res) => {
   console.log("-->CONTENUE emailCryptoJs");
   console.log(emailCryptoJs);
 
-  console.log("--->User");
-  console.log(User);
-
   //Si user existant
-  User.findOne({ email: emailCryptoJs })
+  await User.findOne({ email: emailCryptoJs })
     .then((user) => {
       console.log("-->CONTENUE de user du then de User.findOne()");
       console.log(user);
