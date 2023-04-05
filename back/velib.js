@@ -23,10 +23,15 @@ app.use(express.json());
 //Connexion à la base de données
 const url = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_CLUSTER}.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 
-mongoose
-  .connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("Connexion à MongoDB réussi"))
-  .catch((err) => console.log("Connexion à MongpDB échoué", err));
+try {
+  mongoose.connect(url, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+  console.log("Connexion à MongoDB réussie");
+} catch (error) {
+  console.log("Connexion à MongoDB échouée", error);
+}
 
 //用户的数据库模型
 //modèle de bdd pour singup (pour enregistrer un new)
@@ -51,83 +56,64 @@ const User = mongoose.model("user", userSchema);
 //password, signup
 //route signup
 const Signup = async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    //destructuring
+    const { email, password } = req.body;
 
-  //chiffrer email av envoyer bdd
-  const emailCryptoJs = cryptojs
-    .HmacSHA256(email, `${process.env.CRYPTOJS_EMAIL}`)
-    .toString();
-  console.log(emailCryptoJs);
-
-  //hasher mpd av envoyer bdd
-  //salt=10 cb de fois sera éxecuté l'algo de hashage
-  await bcrypt
-    .hash(password, 10)
-    .then((hash) => {
-      const user = new User({
-        email: emailCryptoJs,
-        password: hash,
-      });
-      console.log(user);
-
-      user
-        .save()
-        .then(() =>
-          res.status(201).json({ message: "Utilisateur créé et sauvegardé" })
-        )
-        .catch((error) => res.status(400).json({ error }).send());
-    })
-    .catch((error) => res.status(500).json({ error }).send(console.log(error)));
+    //hasher mpd avant envoyer dans bdd
+    //salt=10 cb de fois sera éxecuté l'algo de hashage
+    const hash = await bcrypt.hash(password, 10);
+    const user = new User({
+      email: email,
+      password: hash,
+    });
+    console.log(user);
+    await user.save();
+    res.status(201).json({ message: "Utilisateur créé et sauvegardé" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error });
+  }
 };
 
 //route login
 const Login = async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  //chiffrer
-  const emailCryptoJs = cryptojs
-    .HmacSHA256(email, `${process.env.CRYPTOJS_EMAIL}`)
-    .toString();
+    //Si user existant
+    const user = await User.findOne({ email });
+    console.log("-->CONTENUE de user du then de User.findOne()");
+    console.log(user);
+    if (!user) {
+      return res.status(401).json({ error: "Utilisateur inexistant" });
+    }
 
-  console.log("-->CONTENUE emailCryptoJs");
-  console.log(emailCryptoJs);
-
-  //Si user existant
-  await User.findOne({ email: emailCryptoJs })
-    .then((user) => {
-      console.log("-->CONTENUE de user du then de User.findOne()");
-      console.log(user);
-      if (!user) {
-        return res.status(401).json({ error: "Utilisateur inexistant" });
-      }
-      //Contrôler la validité du password envoyer par le front
-      //bcrypt capable de savoir si le mdp de req est la mm que user.password
-      bcrypt
-        .compare(password, user.password)
-        .then((controlPassword) => {
-          console.log("-->controlPassword");
-          console.log(controlPassword);
-
-          //mpd incorrect
-          if (!controlPassword) {
-            return res.status(401).json({ error: "mot de passe incorrect" });
-          }
-          //mdp correct
-          //envoie dans la response du server du userId et du token d'authentification
-          res.status(200).json({
-            //encodage du userId pour la création de nouveau objet (objet et userId seront liés)
-            userId: user._id,
-            token: jwt.sign(
-              //3 args
-              { userId: user._id },
-              `${process.env.JWT_KEY_TOKEN}`,
-              { expiresIn: "2h" }
-            ),
-          });
-        })
-        .catch((error) => res.status(500).json({ error }));
-    })
-    .catch((error) => res.status(500).json({ error }));
+    //Contrôler la validité du password envoyer par le front
+    //bcrypt capable de savoir si le mdp de req est la mm que user.password
+    const controlPassword = await bcrypt.compare(password, user.password);
+    console.log("-->controlPassword");
+    console.log(controlPassword);
+    //mpd incorrect
+    if (!controlPassword) {
+      return res.status(401).json({ error: "mot de passe incorrect" });
+    }
+    //mdp correct
+    //envoie dans la response du server du userId et du token d'authentification
+    res.status(200).json({
+      //encodage du userId pour la création de nouveau objet (objet et userId seront liés)
+      userId: user._id,
+      token: jwt.sign(
+        //3 args
+        { userId: user._id },
+        `${process.env.JWT_KEY_TOKEN}`,
+        { expiresIn: "2h" }
+      ),
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error });
+  }
 };
 
 app.post("/signup", Signup);
