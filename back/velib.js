@@ -2,6 +2,8 @@ const express = require("express");
 const axios = require("axios");
 const morgan = require("morgan");
 const mongoose = require("mongoose");
+const moment = require("moment-timezone");
+moment.tz.setDefault("Europe/Paris");
 const bcrypt = require("bcrypt");
 const cryptojs = require("crypto-js");
 const jwt = require("jsonwebtoken");
@@ -37,6 +39,10 @@ try {
 //modèle de bdd pour singup (pour enregistrer un new)
 const userSchema = mongoose.Schema(
   {
+    username: {
+      type: String,
+      required: true,
+    },
     email: {
       type: String,
       required: true,
@@ -53,17 +59,17 @@ const userSchema = mongoose.Schema(
 //通过mongoose.model上面的定义成模型
 const User = mongoose.model("user", userSchema);
 
-//password, signup
 //route signup
 const Signup = async (req, res) => {
   try {
     //destructuring
-    const { email, password } = req.body;
+    const { username, email, password } = req.body;
 
     //hasher mpd avant envoyer dans bdd
     //salt=10 cb de fois sera éxecuté l'algo de hashage
     const hash = await bcrypt.hash(password, 10);
     const user = new User({
+      username: username,
       email: email,
       password: hash,
     });
