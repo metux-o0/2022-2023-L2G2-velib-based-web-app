@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-
+import { Link } from 'react-router-dom';
 export default function Connection() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
+  const [consoleMessages, setConsoleMessages] = useState([]);
+
   function handleEmailChange(event) {
     setEmail(event.target.value);
   }
@@ -20,15 +21,15 @@ export default function Connection() {
       })
         .then(response => {
           if (response.ok) {
-            console.log('User authenticated successfully');
+            setConsoleMessages(['Utilisateur authentifié avec succès']);
             // Redirect to the home page or a protected page
           } else {
-            console.log('Error:', response.status);
+            setConsoleMessages(["Erreur: le compte n'existe pas"]);
             // Display an error message
           }
         })
         .catch(error => {
-          console.error('Error:', error);
+          setConsoleMessages(['Error:', error]);
           // Display an error message
         });
     }
@@ -47,6 +48,9 @@ export default function Connection() {
         </div>
         <button type="submit">Connexion</button>
       </form>
+      <p style={{color:"red"}}>{consoleMessages}</p>
+      <p>Voulez-vous enregistrer vos adresses favoris ?</p>
+      <button><Link to="/adresse">Cliqué</Link></button>
       </div>
     );
   }

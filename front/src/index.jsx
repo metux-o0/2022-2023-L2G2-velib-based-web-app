@@ -8,6 +8,7 @@ import Header from './components/Header'
 import Error from './components/Error'
 import Inscription from './pages/Inscription'
 import Connection from './pages/Connection'
+import Adresse from './pages/Adresse'
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <Router>
@@ -28,6 +29,9 @@ root.render(
         </Route>
         <Route exact path='/connection'>
           <Connection />
+        </Route>
+        <Route exact path='/adresse'>
+          <Adresse/>
         </Route>
         <Route>
           <Error />

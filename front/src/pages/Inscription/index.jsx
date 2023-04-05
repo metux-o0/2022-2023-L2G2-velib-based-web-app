@@ -5,7 +5,8 @@ export default function Inscription() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
+  const [consoleMessages, setConsoleMessages] = useState([]);
+
   function handleUsernameChange(event) {
     setUsername(event.target.value);
   }
@@ -26,15 +27,15 @@ export default function Inscription() {
     })
       .then(response => {
         if (response.ok) {
-          console.log('User created successfully');
+          setConsoleMessages(['Utilisateur créé avec succès']);
           // Redirect to the home page or login page
         } else {
-          console.log('Error:', response.status);
+          setConsoleMessages(["Erreur: l'email est déjà utilisé"]);
           // Display an error message
         }
       })
       .catch(error => {
-        console.error('Error:', error);
+        setConsoleMessages(['Erreur:', error]);
         // Display an error message
       });
   }
@@ -63,6 +64,8 @@ export default function Inscription() {
       <p>
       Vous avez déjà un compte?<Link to="/connection">Login</Link>
       </p>
+      <br></br>
+      <p style={{color:"red"}}>{consoleMessages}</p>
     </div>
   );
 }
