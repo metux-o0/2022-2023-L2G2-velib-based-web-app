@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
-export default function Connection() {
+export default function Connection({ onLogin }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [consoleMessages, setConsoleMessages] = useState([]);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const history = useHistory();
 
   function handleEmailChange(event) {
     setEmail(event.target.value);
@@ -25,8 +25,8 @@ export default function Connection() {
       .then(response => {
         if (response.ok) {
           setConsoleMessages(['Utilisateur authentifié avec succès']);
-          setIsAuthenticated(true); // Set the user as authenticated
-          // Redirect to the home page or a protected page
+          onLogin(); // Set the user as authenticated
+          history.push('/adresse'); // Redirect to the adresse page
         } else {
           setConsoleMessages(["Erreur: le compte n'existe pas"]);
           // Display an error message
@@ -40,7 +40,7 @@ export default function Connection() {
 
   return (
     <div>
-      <h1>Connection</h1>
+      <h1>Connexion</h1>
       <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="email">Email : </label>
@@ -53,14 +53,10 @@ export default function Connection() {
         <button type="submit">Connexion</button>
       </form>
       <p style={{ color: 'red' }}>{consoleMessages}</p>
-      {isAuthenticated ? (
-
-        <button>
-          <Link to="/adresse">Ajouter vos adresses favoris</Link>
-        </button>
-      ) : (
-        <p>Veuillez vous connecter pour accéder à vos adresses favorites.</p>
-      )}
+      <p>
+        Pas encore de compte? <Link to="/inscription">Inscrivez-vous ici</Link>
+      </p>
+      <p>Veuillez vous connecter pour ajouter vos adresses favoris</p>
     </div>
   );
 }
