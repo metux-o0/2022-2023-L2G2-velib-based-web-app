@@ -33,7 +33,7 @@ function App() {
 
   return (
     <Router>
-      <Header onLogout={handleLogout} />
+      <Header isAuthenticated={isAuthenticated} onLogout={handleLogout} />
       <Switch>
         <Route exact path="/">
           <Home />
@@ -51,7 +51,7 @@ function App() {
         <Route exact path="/connection">
           <Connection onLogin={handleLogin} />
         </Route>
-        <Route exact path="/connection/adresse">
+        <Route exact path="/adresse">
           {isAuthenticated ? <Adresse /> : <Redirect to="/connection" />}
         </Route>
         <Route>
@@ -62,6 +62,11 @@ function App() {
   );
 }
 
+export function LogoutButton({ onLogout }) {
+  return (
+    <button onClick={onLogout} style={{backgroundColor:"blanchedalmond",borderBlockColor:"antiquewhite",padding:"20px 80px",color:"orange"}}>Déconnexion</button>
+  );
+}
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <App/>
