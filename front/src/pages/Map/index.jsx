@@ -214,7 +214,7 @@ if (searchBox && searchBox.getPlaces().length > 0) {
           <input
             id="autocomplete-input"
             type="text"
-            placeholder="Enter an address"
+            placeholder="Entrer une adresse"
             style={{
               boxSizing: `border-box`,
               border: `1px solid transparent`,
