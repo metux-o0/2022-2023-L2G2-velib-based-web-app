@@ -18,13 +18,18 @@ Liste des technolagies utilisé dans le projet :
 
 ## Installaton
 
-$ git clone https://github.com/metux-o0/2022-2023-L2G2-velib-based-web-app.git 
+$ git clone https://github.com/metux-o0/2022-2023-L2G2-velib-based-web-app.git
+
 ajouter la clé api google map envoyé par WhatsApp dans le fichier front/src/pages/Map/config.json 
+
 ajouter le nom d'utilisateur, le mot de passe, le cluster, le nom, le crypto-email et la clé token de la base de donnée MongoDB envoyé par WhatsApp dans le fichier back/.env 
+
 ouvrir un terminal
+
 $ cd /2022-2023-L2G2-velib-based-web-app/back  
-$ npm install morgan 
-$ npm start 
+$ npm install morgan  
+$ npm start  
+
 ouvrir un autre terminal 
 $ cd ../front  
-$ npm start 
+$ npm start  
