@@ -7,7 +7,7 @@ Liste des technolagies utilisé dans le projet :
 
 - Back : 
     - axios version : 1.3.4
-    - express vertion : 4.18.2
+    - express version : 4.18.2
 
 
 - Front:
@@ -22,7 +22,7 @@ $ git clone https://github.com/metux-o0/2022-2023-L2G2-velib-based-web-app.git
 
 ajouter la clé api google map envoyé par WhatsApp dans le fichier front/src/pages/Map/config.json 
 
-ajouter le nom d'utilisateur, le mot de passe, le cluster, le nom, le crypto-email et la clé token de la base de donnée MongoDB envoyé par WhatsApp dans le fichier back/.env 
+ajouter le nom d'utilisateur, le mot de passe, le cluster, le nom de la base de donnée MongoDB et la clé token envoyé par WhatsApp dans le fichier back/.env 
 
 ouvrir un terminal
 
