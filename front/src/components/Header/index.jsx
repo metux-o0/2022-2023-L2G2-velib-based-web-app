@@ -10,7 +10,7 @@ export default function Header({ isAuthenticated, onLogout }) {
           ) : (
             <>
               <button className='bouton'><a href="/inscription" className="lien">Inscription</a></button>
-              <button className='bouton'><a href="/connection" className="lien">Connection</a></button>
+              <button className='bouton'><a href="/connection" className="lien">Connexion</a></button>
             </>
           )}
         <button className='bouton'><a href="/" className="lien">Découvrir Vélib</a></button>

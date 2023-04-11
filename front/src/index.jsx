@@ -7,7 +7,7 @@ import Carte from './pages/Map';
 import Header from './components/Header';
 import Error from './components/Error';
 import Inscription from './pages/Inscription';
-import Connection from './pages/Connexion';
+import Connexion from './pages/Connexion';
 import Adresse from './pages/Adresse';
 
 function App() {
@@ -49,7 +49,7 @@ function App() {
           <Inscription />
         </Route>
         <Route exact path="/connection">
-          <Connection onLogin={handleLogin} />
+          <Connexion onLogin={handleLogin} />
         </Route>
         <Route exact path="/adresse">
           {isAuthenticated ? <Adresse /> : <Redirect to="/connection" />}

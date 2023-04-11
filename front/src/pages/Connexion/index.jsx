@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 
-export default function Connection({ onLogin }) {
+export default function Connexion({ onLogin }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [consoleMessages, setConsoleMessages] = useState([]);
