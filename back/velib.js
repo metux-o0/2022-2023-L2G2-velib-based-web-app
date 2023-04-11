@@ -9,22 +9,16 @@ const cryptojs = require("crypto-js");
 const jwt = require("jsonwebtoken");
 
 const app = express();
-
 const dotenv = require("dotenv");
 dotenv.config();
-
 app.use(morgan("dev"));
-
 //debug mongoose
 console.log("--->debug logger mongoose");
 mongoose.set("debug", true);
-
 //transformer body en json
 app.use(express.json());
-
 //Connexion à la base de données
 const url = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_CLUSTER}.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
-
 try {
   mongoose.connect(url, {
     useNewUrlParser: true,
@@ -52,19 +46,15 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-  },
-  { timestamps: true }
-);
+});
 
 //通过mongoose.model上面的定义成模型
 const User = mongoose.model("user", userSchema);
-
 //route signup
 const Signup = async (req, res) => {
   try {
     //destructuring
     const { username, email, password } = req.body;
-
     //hasher mpd avant envoyer dans bdd
     //salt=10 cb de fois sera éxecuté l'algo de hashage
     const hash = await bcrypt.hash(password, 10);
@@ -81,12 +71,10 @@ const Signup = async (req, res) => {
     res.status(500).json({ error });
   }
 };
-
 //route login
 const Login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
     //Si user existant
     const user = await User.findOne({ email });
     console.log("-->CONTENUE de user du then de User.findOne()");
@@ -94,7 +82,6 @@ const Login = async (req, res) => {
     if (!user) {
       return res.status(401).json({ error: "Utilisateur inexistant" });
     }
-
     //Contrôler la validité du password envoyer par le front
     //bcrypt capable de savoir si le mdp de req est la mm que user.password
     const controlPassword = await bcrypt.compare(password, user.password);
@@ -121,11 +108,8 @@ const Login = async (req, res) => {
     res.status(500).json({ error });
   }
 };
-
 app.post("/signup", Signup);
-
 app.post("/login", Login);
-
 const fuseauHoraire =
   "https://velib-metropole-opendata.smoove.pro/opendata/Velib_Metropole/system_information.json";
 const veloBornetteDispo =
@@ -143,7 +127,6 @@ const getStations = async (req, res, next) => {
     next(err);
   }
 };
-
 //Middleware pour récupérer les velos dispo
 const getVeloDispo = async (req, res, next) => {
   try {
@@ -154,7 +137,6 @@ const getVeloDispo = async (req, res, next) => {
     next(err);
   }
 };
-
 // Middleware pour récupérer le fuseau
 const getFuseau = async (req, res, next) => {
   try {
@@ -165,21 +147,16 @@ const getFuseau = async (req, res, next) => {
     next(err);
   }
 };
-
 // Définir la route /stations pour récupérer le flux de toutes les stations
 app.get("/stations", getStations);
-
 //Définir la route /velodispo pour récupérer la liste des velos disponibles
 app.get("/velodispo", getVeloDispo);
-
 // Définir la route /fuseau pour récupérer le fuseau horaire
 app.get("/fuseau", getFuseau);
-
 // Le traitement par défaut si jamais la route tapée sur le navigateur n'est pas connue du serveur
 app.use((req, res) => {
   res.status(404).send("Service ou page non trouvée !");
 });
-
 // Pour demarrer le serveur et le faire ecouter sur un port passé en parametre
 app.listen(process.env.PORT, () => {
   console.log(`Serveur écoute sur le port : ${process.env.PORT}`);
