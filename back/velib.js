@@ -2,10 +2,7 @@ const express = require("express");
 const axios = require("axios");
 const morgan = require("morgan");
 const mongoose = require("mongoose");
-const moment = require("moment-timezone");
-moment.tz.setDefault("Europe/Paris");
 const bcrypt = require("bcrypt");
-const cryptojs = require("crypto-js");
 const jwt = require("jsonwebtoken");
 
 const app = express();
@@ -19,15 +16,10 @@ mongoose.set("debug", true);
 app.use(express.json());
 //Connexion à la base de données
 const url = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_CLUSTER}.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
-try {
-  mongoose.connect(url, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-  console.log("Connexion à MongoDB réussie");
-} catch (error) {
-  console.log("Connexion à MongoDB échouée", error);
-}
+mongoose
+  .connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log("Connexion à MongoDB réussi"))
+  .catch((err) => console.log("Connexion à MongpDB échoué", err));
 
 //用户的数据库模型
 //modèle de bdd pour singup (pour enregistrer un new)
@@ -48,22 +40,26 @@ const userSchema = mongoose.Schema(
     },
 });
 
-//通过mongoose.model上面的定义成模型
 const User = mongoose.model("user", userSchema);
-//route signup
+
+//Middleware pour faire une inscription
 const Signup = async (req, res) => {
   try {
-    //destructuring
     const { username, email, password } = req.body;
-    //hasher mpd avant envoyer dans bdd
-    //salt=10 cb de fois sera éxecuté l'algo de hashage
+
+    //vérifier si email utilisé
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ error: "Adresse e-mail déjà utilisé" });
+    }
+
+    //hasher mot de passe avant envoyer dans bdd
     const hash = await bcrypt.hash(password, 10);
     const user = new User({
       username: username,
       email: email,
       password: hash,
     });
-    console.log(user);
     await user.save();
     res.status(201).json({ message: "Utilisateur créé et sauvegardé" });
   } catch (error) {
@@ -71,38 +67,32 @@ const Signup = async (req, res) => {
     res.status(500).json({ error });
   }
 };
-//route login
+//Middleware pour faire une connexion
 const Login = async (req, res) => {
   try {
     const { email, password } = req.body;
+
     //Si user existant
     const user = await User.findOne({ email });
-    console.log("-->CONTENUE de user du then de User.findOne()");
-    console.log(user);
     if (!user) {
       return res.status(401).json({ error: "Utilisateur inexistant" });
     }
+
     //Contrôler la validité du password envoyer par le front
     //bcrypt capable de savoir si le mdp de req est la mm que user.password
     const controlPassword = await bcrypt.compare(password, user.password);
-    console.log("-->controlPassword");
-    console.log(controlPassword);
-    //mpd incorrect
+    //mot de passe incorrect
     if (!controlPassword) {
       return res.status(401).json({ error: "mot de passe incorrect" });
     }
-    //mdp correct
-    //envoie dans la response du server du userId et du token d'authentification
-    res.status(200).json({
-      //encodage du userId pour la création de nouveau objet (objet et userId seront liés)
-      userId: user._id,
-      token: jwt.sign(
-        //3 args
-        { userId: user._id },
-        `${process.env.JWT_KEY_TOKEN}`,
-        { expiresIn: "2h" }
-      ),
-    });
+
+    //mot de passe correct
+    const token = jwt.sign(
+      { userId: user._id },
+      `${process.env.JWT_KEY_TOKEN}`,
+      { expiresIn: "1h" }
+    );
+    res.status(200).json({ userId: user._id, token });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error });
