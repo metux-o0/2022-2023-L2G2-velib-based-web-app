@@ -7,7 +7,7 @@ import Carte from './pages/Map';
 import Header from './components/Header';
 import Error from './components/Error';
 import Inscription from './pages/Inscription';
-import Connection from './pages/Connection';
+import Connection from './pages/Connexion';
 import Adresse from './pages/Adresse';
 
 function App() {
