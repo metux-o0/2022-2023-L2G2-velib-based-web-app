@@ -3,7 +3,7 @@ This is the project made by my students in the Descartes University of Paris. Th
 
 ## Technologies
 
-Liste des technolagies utilisé dans le projet :
+Liste des technologies utilisé dans le projet :
 
 - Back : 
     - axios version : 1.3.4
